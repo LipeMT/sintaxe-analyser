@@ -1,0 +1,6 @@
+int 1 = 45;
+int b = (a - 30) * 93;
+char c = b + 60;
+char z = '';
+if(b != 1)
+    z = 'f';
