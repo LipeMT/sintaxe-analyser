@@ -1,3 +1,25 @@
+let { symbolTable, tokens } = require('./Lexical/lexical-analyser')
+tokens = tokens.map(token => token.replace(`<`, ``).replace(`>`, ``).split(`,`))
+
+const arr = []
+
+for (const item of tokens) {
+  let [token, id] = item
+  id = id.trim()
+  const row = symbolTable.find((element) => {
+    return element.id == id
+  })
+  let lexema = row.lexema
+  if (row.token === 'NUMBER' || row.token === 'ID') {
+    lexema = row.lexema.split('')
+    arr.push(...lexema)
+  } else {
+    arr.push(lexema)
+  }
+}
+// console.log(arr)
+
+
 const fs = require('fs');
 const {
   processProductions,
@@ -15,6 +37,9 @@ const codeReader = (code) => {
   });
   return productions;
 };
+
+const code = fs.readFileSync('./input.txt', 'utf8');
+const readedCode = codeReader(code);
 
 const findFirst = (code, isTerminal) => {
   const firsts = {};
@@ -170,9 +195,6 @@ const buildParsingTable = (code, firsts, follows, isTerminal) => {
   return table;
 };
 
-const code = fs.readFileSync('./input.txt', 'utf8');
-const readedCode = codeReader(code);
-
 const isTerminal = (value) => {
   const nonTerminals = Object.keys(readedCode);
   return !nonTerminals.includes(value);
@@ -182,16 +204,13 @@ function parseInput(tokens, parsingTable, startSymbol) {
   const stack = ['$', startSymbol];
   const input = [...tokens, '$'];
   const output = [];
-  console.table(parsingTable)
 
   let i = 0;
 
   while (stack.length > 0) {
-    console.log(stack)
     const top = stack.pop();
     const currentToken = input[i];
 
-    // Terminal
     if (top === currentToken) {
       output.push(`Match: ${top}`);
       i++;
@@ -200,9 +219,9 @@ function parseInput(tokens, parsingTable, startSymbol) {
       if (!production) {
         throw new Error(`Erro de sintaxe: não há produção para [${top}][${currentToken}]`);
       }
-
-      output.push(`${top} → ${production}`);
-      if (production != 'ϵ' && production != 'ε') {
+      
+      output.push(`${top} → ${production.join('')}`);
+      if (production != 'ϵ' && production != 'ϵ') {
         for (let j = production.length - 1; j >= 0; j--) {
           stack.push(production[j]);
         }
@@ -210,7 +229,6 @@ function parseInput(tokens, parsingTable, startSymbol) {
     } else {
       throw new Error(`Erro de sintaxe: esperado '${top}', mas encontrado '${currentToken}'`);
     }
-    console.log('final: ', stack)
   }
 
   if (input[i] !== '$') {
@@ -220,21 +238,15 @@ function parseInput(tokens, parsingTable, startSymbol) {
   return output;
 }
 
-
-
-
 const firsts = findFirst(readedCode, isTerminal);
 const follows = findFollow(readedCode, firsts, isTerminal);
-console.log(follows)
 const parsingTable = buildParsingTable(readedCode, firsts, follows, isTerminal);
 
-// console.log('\nPARSING TABLE\n');
-// console.table(displayParsingTable(parsingTable));
 
-const tokens = ['id', '*', 'id', '$'];
+const input = [...arr, `$`];
 
 try {
-  const result = parseInput(tokens, parsingTable, 'E');
+  const result = parseInput(input, parsingTable, 'S');
   console.log('\nANÁLISE DESCENDENTE:\n');
   result.forEach(step => console.log(step));
 } catch (e) {

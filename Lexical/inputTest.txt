@@ -1,6 +1,8 @@
-int 1 = 45;
-int b = (a - 30) * 93;
-char c = b + 60;
-char z = '';
-if(b != 1)
-    z = 'f';
+int a = 134;
+int b = 23;
+if (b > 30)
+  int c = b + a;
+if (a > 100) {
+  int c = a - b;
+  int d = a * a + c;
+} 

@@ -20,7 +20,7 @@ for (const value of splitedCode) {
   // Verifica se é um token inválido/desconhecido
   if (tokenInfo.token === 'UNKNOWN') {
     console.error(`Erro léxico: Token desconhecido '${value}'`);
-    continue; // Pula para o próximo token
+    break; 
   }
 
   const lexemaAlreadyExists = symbolTable.some(entry => entry.lexema === value);
@@ -37,7 +37,7 @@ for (const value of splitedCode) {
 function splitCode(input) {
   // Verificação de comentários não fechados
   if ((input.match(/\/\*/g) || []).length !== (input.match(/\*\//g) || []).length) {
-      console.error('Erro: Comentário não fechado');
+    console.error('Erro: Comentário não fechado');
   }
 
   // Regex original melhorada
@@ -54,11 +54,6 @@ function createToken(value) {
   // Verificação de números mal formados
   if (/^\d+\.\d+\./.test(value)) {
     return { token: 'UNKNOWN', error: 'Número com ponto decimal duplicado' };
-  }
-
-  // Verificação de identificadores muito longos
-  if (value.length > 255 && /^[a-zA-Z_]/.test(value)) {
-    return { token: 'UNKNOWN', error: 'Identificador muito longo (max 255 caracteres)' };
   }
 
   const type = findType(value);
@@ -121,11 +116,13 @@ function checkIfIsReservedWord(word) {
   return reservedWords.includes(word);
 }
 
-console.log('--> Lexemas');
-console.log(splitedCode.join(' | '));
+// console.log('--> Lexemas');
+// console.log(splitedCode.join(' | '));
 
-console.log('\n--> Tabela de símbolos');
-console.log(symbolTable);
+// console.log('\n--> Tabela de símbolos');
+// console.log(symbolTable);
 
-console.log('\n--> Código Tokenizado');
-console.log(tokens.join(' '));
+// console.log('\n--> Código Tokenizado');
+// console.log(tokens.join(' '));
+
+module.exports = { symbolTable, tokens }
